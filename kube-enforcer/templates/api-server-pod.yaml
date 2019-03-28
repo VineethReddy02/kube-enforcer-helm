@@ -1,0 +1,33 @@
+{{- if not .Values.managed }}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ include "kube-enforcer.fullname" . }}-prep
+  labels:
+    app.kubernetes.io/name: {{ include "kube-enforcer.name" . }}
+    helm.sh/chart: {{ include "kube-enforcer.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  serviceAccountName: {{ .Release.Name }}-sa
+  containers:
+    - name: {{ .Chart.Name }}-prep
+      image: "{{ .Values.imageCredentials.repositoryUriPrefix }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+      imagePullPolicy: {{ .Values.image.pullPolicy }}
+      command: ["/kube-enforcer/cfg"]
+      args: ["--type", "{{ .Values.environment }}", "--file", "{{ .Values.k8s_api_server_manifest_file_path }}"]
+      volumeMounts:
+       - name: "etc-kubernetes"
+         mountPath: "/etc/kubernetes"
+  volumes:
+    - name: "etc-kubernetes"
+      hostPath:
+        path: "/etc/kubernetes"
+  restartPolicy: "Never"
+  nodeSelector:
+    kubernetes.io/role: "master"
+  tolerations:
+  - key: node-role.kubernetes.io/master
+    effect: NoSchedule
+    operator: Exists
+{{- end }}
