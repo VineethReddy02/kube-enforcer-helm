@@ -1,7 +1,8 @@
 # Specifies the secret data for imagePullSecrets needed to fetch the private docker images
 imageCredentials:
+  # If aqua-registry already exists in the cluster. Make create to false. So it won't attempt to create a new registry secret. 
   create: true
-  name: aqua-registry-secret # example
+  name: aqua-image-pull-secret # example
   repositoryUriPrefix: "registry.aquasec.com" # for dockerhub - "docker.io"
   registry: "registry.aquasec.com" #REQUIRED only if create is true, for dockerhub - "index.docker.io/v1/"
   username: ""
@@ -10,25 +11,47 @@ imageCredentials:
 
 managed: false
 environment: aws # aws, acs, onprem
-k8s_api_server_manifest_file_path: /etc/kubernetes/manifests/kube-apiserver.yaml
 
-aqua_server_url: https://server_ip:8080
-aqua_username: administrator
-aqua_password: change
 aqua_enable_cache: yes
 aqua_cache_expiration_period: 60
 
-config_tls_auth: false
-config_tls_secret_name: apiserver-creds 
-config_tls_secret_key: ca.pem
-
 image:
   repository: kube-enforcer
-  tag: 4.0
+  tag: 5.0.0
   pullPolicy: Always
 
-nameOverride: "kube-enforcer"
-fullnameOverride: "kube-enforcer"
+nameOverride: "aqua-kube-enforcer"
+fullnameOverride: "aqua-kube-enforcer"
+
+namespace: "aqua"
+
+certsSecret:
+  name: aqua-kube-enforcer-certs
+  serverCertificate: "fgfdgfdgfdgfdgsdrgfdfd"
+  serverKey: ""
+
+aquaSecret:
+  name: aqua-kube-enforcer-token  
+  aquaUsername: ""
+  aquaPassword: ""
+  kubeEnforcerToken: ""
+
+envs:
+  gatewayAddress: aqua-gateway:8443 
+
+
+serviceAccount:
+  name: aqua-kube-enforcer-sa
+
+clusterRole:
+  name: aqua-kube-enforcer
+
+clusterRoleBinding:
+  name: aqua-kube-enforcer  
+
+validatingWebhook:
+  name: kube-enforcer-admission-hook-config
+  caBundle: ""
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious

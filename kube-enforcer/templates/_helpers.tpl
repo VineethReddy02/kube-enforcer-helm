@@ -34,3 +34,27 @@ Create chart name and version as used by the chart label.
 {{- define "imagePullSecret" }}
 {{- printf "{\"auths\": {\"%s\": {\"auth\": \"%s\"}}}" (required "A valid .Values.imageCredentials.registry entry required!" .Values.imageCredentials.registry) (printf "%s:%s" (required "A valid .Values.imageCredentials.username entry required!" .Values.imageCredentials.username) (required "A valid .Values.imageCredentials.password entry required!" .Values.imageCredentials.password) | b64enc) | b64enc }}
 {{- end }}
+
+{{- define "serverCertificate" }}
+{{- printf "%s" (required "A valid .Values.certsSecret.serverCertificate entry required!" .Values.certsSecret.serverCertificate) | b64enc | replace "\n" "" }}
+{{- end }}
+
+{{- define "serverKey" }}
+{{- printf "%s" (required "A valid .Values.certsSecret.serverKey entry required!" .Values.certsSecret.serverKey) | b64enc | replace "\n" "" }}
+{{- end }}
+
+{{- define "caBundle" }}
+{{- printf "%s" (required "A valid .Values.validatingWebhook.caBundle entry required!" .Values.validatingWebhook.caBundle) | b64enc | replace "\n" "" }}
+{{- end }}
+
+{{- define "token" }}
+{{- printf "%s" (required "A valid .Values.aquaSecret.kubeEnforcerToken entry required!" .Values.aquaSecret.kubeEnforcerToken) | b64enc }}
+{{- end }}
+
+{{- define "username" }}
+{{- printf "%s" (required "A valid .Values.aquaSecret.aquaUsername entry required!" .Values.aquaSecret.aquaUsername) | b64enc }}
+{{- end }}
+
+{{- define "password" }}
+{{- printf "%s" (required "A valid .Values.aquaSecret.aquaPassword entry required!" .Values.aquaSecret.aquaPassword) | b64enc }}
+{{- end }}
